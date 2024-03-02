@@ -71,31 +71,33 @@ gallery.addEventListener('click', handleModalOpen);
 
 function handleModalOpen(event) {
   event.preventDefault();
-  if (event.currentTarget === event.target) return;
+  if (event.target.classList.contains('gallery-image')) {
+    // створення розмітки модального вікна
+    const instance = basicLightbox.create(
+      `<div class="modal"><img src='${event.target.dataset.source}' /></div>`,
+      {
+        onShow: () => {
+          document.addEventListener('keydown', closeEsc);
+        },
+        onClose: () => {
+          document.removeEventListener('keydown', closeEsc);
+        },
+      }
+    );
 
-  // створення розмітки модального вікна
-  const instance = basicLightbox.create(
-    `
-	  <div class="modal">
-             <img
-      src='${event.target.dataset.source}'
-    />
-    </div>
-`,
-    { onShow: () => document.addEventListener('keydown', closeEsc) }
-  );
-
-  // закриття модального вікна "Esc"
-  const closeEsc = esc => {
-    if (esc.key === 'Escape') {
-      instance.close();
+    // закриття модального вікна "Esc"
+    function closeEsc(event) {
+      if (event.key === 'Escape') {
+        instance.close();
+        // Видалення слухача події
+        document.removeEventListener('keydown', closeEsc);
+      }
     }
-  };
 
-  // виклик модального вікна
-  instance.show();
+    // виклик модального вікна
+    instance.show();
+  }
 }
-
 // створення розмітки галереї
 function createMarkup(arr) {
   return arr
